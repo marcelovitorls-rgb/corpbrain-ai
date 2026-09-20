@@ -37,7 +37,7 @@ test('self-service profile validates fields and cannot change account or permiss
         const { user } = await response.json();
         assert.equal(user.name, 'Demo User');
         assert.equal(user.title, 'Design');
-        assert.equal(user.initials, 'AS');
+        assert.equal(user.initials, 'DU');
         assert.equal(user.role, 'user');
         assert.equal(user.email, 'user@example.com');
         assert.equal(user.password, undefined);
