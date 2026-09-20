@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="330" viewBox="0 0 1200 330" role="img" aria-labelledby="title description">
+  <title id="title">CorpBrain AI</title>
+  <desc id="description">Assistente corporativo para conectar conhecimento, documentos e equipes.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101714"/>
+      <stop offset="1" stop-color="#1b2a21"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#71b487"/>
+      <stop offset="1" stop-color="#a3d6ad"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#438b64" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#438b64" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="330" rx="24" fill="url(#background)"/>
+  <circle cx="1020" cy="95" r="280" fill="url(#glow)"/>
+  <path d="M24 25v280" stroke="url(#accent)" stroke-width="4" stroke-linecap="round"/>
+  <g fill="none" stroke="#91c99c" stroke-opacity=".46" stroke-width="2">
+    <path d="m865 86 78 43 94-49 78 43M865 86l9 104 69-61 23 96 71-145 0 145 78-102M874 190l84 35 88-35 78 37"/>
+  </g>
+  <g fill="#a5d6ad">
+    <circle cx="865" cy="86" r="5"/><circle cx="943" cy="129" r="5"/><circle cx="1037" cy="80" r="5"/>
+    <circle cx="1115" cy="123" r="5"/><circle cx="874" cy="190" r="5"/><circle cx="958" cy="225" r="5"/>
+    <circle cx="1046" cy="190" r="5"/><circle cx="1124" cy="227" r="5"/>
+  </g>
+  <text x="76" y="84" fill="#a4cfaa" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="600" letter-spacing="3">CONHECIMENTO QUE CONECTA</text>
+  <text x="72" y="164" fill="#f0f5f0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="64" font-weight="650" letter-spacing="-2">CorpBrain</text>
+  <text x="383" y="164" fill="#94cda0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="64" font-weight="500" letter-spacing="-2">AI</text>
+  <text x="76" y="207" fill="#bdcbbf" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="19">Seu conhecimento corporativo, organizado e ao alcance da equipe.</text>
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" font-weight="600">
+    <rect x="76" y="246" width="142" height="34" rx="17" fill="#263a2c" stroke="#3b5943"/>
+    <text x="147" y="268" fill="#c5ddc8" text-anchor="middle">Chat inteligente</text>
+    <rect x="230" y="246" width="174" height="34" rx="17" fill="#263a2c" stroke="#3b5943"/>
+    <text x="317" y="268" fill="#c5ddc8" text-anchor="middle">Base de conhecimento</text>
+    <rect x="416" y="246" width="167" height="34" rx="17" fill="#263a2c" stroke="#3b5943"/>
+    <text x="499" y="268" fill="#c5ddc8" text-anchor="middle">Documentos e equipe</text>
+  </g>
+</svg>

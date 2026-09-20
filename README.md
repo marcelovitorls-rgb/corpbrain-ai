@@ -1,22 +1,23 @@
-# 🧠 CorpBrain AI
+<div align="center">
+  <img src="assets/corpbrain-banner.svg" alt="CorpBrain AI — assistente corporativo de conhecimento" width="100%">
+</div>
 
-**Assistente de IA Corporativo com Base de Conhecimento**
+<p align="center">
+  Plataforma web para organizar o conhecimento da empresa e ajudar equipes a encontrar respostas em documentos e processos.
+</p>
 
-Sistema web interno para gestão de conhecimento corporativo com chat inteligente, upload de documentos, extração de conteúdo de PDFs e gerenciamento de usuários.
+| **Converse** | **Organize** | **Encontre** |
+|:---|:---|:---|
+| Chat com IA conectado à base de conhecimento. | Documentos separados por categorias e acessos. | Busca, pré-visualização e download de materiais. |
+| **Administre**<br>Usuários, perfis e permissões em um só lugar. | **Acompanhe**<br>Métricas de uso e consultas de baixa confiança. | **Configure**<br>Provedor de IA e chave gerenciados no servidor. |
+
+<p align="center"><sub>Node.js · Express · SQLite · JavaScript</sub></p>
 
 ---
 
 ## 📸 Visão Geral
 
-CorpBrain AI é uma plataforma SPA (Single Page Application) full-stack que permite:
-
-- **Chat com IA** — Interface conversacional para consultas na base de conhecimento (preparado para integração com API de IA)
-- **Base de Conhecimento** — Organização de documentos em categorias com visualização e download
-- **Upload de Documentos** — Upload de arquivos com suporte a múltiplos formatos (PDF, DOCX, XLSX, CSV, etc.)
-- **Pré-visualização de PDFs** — Extração automática de texto de PDFs para leitura direta no navegador
-- **Gerenciamento de Usuários** — CRUD completo com controle de acesso (Admin / Usuário)
-- **Analytics** — Painel com métricas de uso e consultas de baixa confiança
-- **Configurações de IA** — Interface para configurar provedor e chave de API
+O CorpBrain AI reúne chat, documentos e ferramentas de administração em uma única interface para a equipe.
 
 ---
 
