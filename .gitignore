@@ -1,0 +1,16 @@
+node_modules/
+node_modules_tmp/
+.claude/
+CLAUDE.md
+Imagem do Codex *.png
+corpbrain.db
+corpbrain.db.lock
+corpbrain.db.tmp
+server/.jwt-secret
+server/.ai-encryption-key
+server/.initial-credentials
+server/uploads/*
+!server/uploads/.gitkeep
+.env
+.env.*
+!.env.example

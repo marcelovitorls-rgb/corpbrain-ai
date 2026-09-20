@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorpBrain AI — Assistente Corporativo Inteligente</title>
+    <meta name="description" content="CorpBrain AI é seu assistente corporativo inteligente para pesquisar informações sobre produtos, processos internos e materiais de apresentação.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="modern.css">
+
+    <!-- Aplica o tema salvo antes da primeira renderização, para evitar flash do tema errado -->
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('corpbrain_theme');
+                if (theme === 'light' || theme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+            } catch (e) { /* localStorage indisponível (modo privado etc.) — segue com o tema do sistema */ }
+        })();
+    </script>
+</head>
+<body>
+
+    <!-- ============================================= -->
+    <!--  TELA DE LOGIN                                -->
+    <!-- ============================================= -->
+    <div class="login-screen" id="loginScreen">
+        <!-- Background animado -->
+        <div class="login-bg">
+            <div class="login-orb login-orb-1"></div>
+            <div class="login-orb login-orb-2"></div>
+            <div class="login-orb login-orb-3"></div>
+        </div>
+
+        <section class="login-story" aria-label="Conheça o CorpBrain">
+            <span class="eyebrow">CONHECIMENTO QUE CONECTA</span>
+            <h2>O que sua equipe sabe.<br><em>Ao seu alcance.</em></h2>
+            <p>Transforme documentos, processos e ideias em respostas para seguir em frente.</p>
+            <div class="story-topics"><span>01 / Produtos</span><span>02 / Processos</span><span>03 / Materiais</span></div>
+            <div class="story-note"><i data-lucide="layers"></i><span>Um lugar para o conhecimento da sua empresa.</span></div>
+        </section>
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="login-logo">
+                <div class="login-logo-icon">
+                    <i data-lucide="brain"></i>
+                </div>
+                <h1 class="login-logo-text">CorpBrain <span class="gradient-text">AI</span></h1>
+                <p class="login-logo-subtitle">Bem-vindo de volta. Entre para continuar.</p>
+            </div>
+
+            <!-- Formulário -->
+            <form class="login-form" id="loginForm" autocomplete="off">
+                <div class="login-field">
+                    <label for="loginEmail">
+                        <i data-lucide="mail"></i>
+                        <span>E-mail</span>
+                    </label>
+                    <input type="email" id="loginEmail" placeholder="seu@email.com" required autocomplete="off">
+                </div>
+                <div class="login-field">
+                    <label for="loginPassword">
+                        <i data-lucide="lock"></i>
+                        <span>Senha</span>
+                    </label>
+                    <div class="password-wrapper">
+                        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="off">
+                        <button type="button" class="password-toggle" id="passwordToggle" title="Mostrar senha">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mensagem de erro -->
+                <div class="login-error" id="loginError" style="display:none;">
+                    <i data-lucide="alert-circle"></i>
+                    <span id="loginErrorMsg">Credenciais inválidas</span>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span class="login-btn-text">Entrar</span>
+                    <span class="login-btn-loader" style="display:none;">
+                        <i data-lucide="loader"></i>
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!--  APP WRAPPER (oculto até login)               -->
+    <!-- ============================================= -->
+    <div class="app-wrapper" id="appWrapper" style="display:none;">
+
+        <!-- ============================================= -->
+        <!--  SIDEBAR DE NAVEGAÇÃO                         -->
+        <!-- ============================================= -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Header do Sidebar -->
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i data-lucide="brain"></i>
+                    </div>
+                    <span class="logo-text">CorpBrain <span class="logo-ai">AI</span></span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" title="Recolher menu">
+                    <i data-lucide="panel-left-close"></i>
+                </button>
+            </div>
+
+            <!-- Botão Nova Conversa -->
+            <button class="new-chat-btn" id="newChatBtn">
+                <i data-lucide="plus"></i>
+                <span>Nova Conversa</span>
+            </button>
+
+            <!-- Navegação Principal -->
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="chat" id="nav-chat">
+                    <i data-lucide="message-square"></i>
+                    <span>Chat</span>
+                </a>
+                <a href="#" class="nav-item" data-page="knowledge" id="nav-knowledge">
+                    <i data-lucide="library"></i>
+                    <span>Materiais de Apoio</span>
+                </a>
+                <div class="settings-nav-group" id="settingsNavGroup" style="display:none;">
+                    <button type="button" class="settings-nav-toggle" id="settingsNavToggle" aria-expanded="false" aria-controls="settingsSubnav">
+                        <i data-lucide="settings"></i><span>Configurações</span><i data-lucide="chevron-down" class="settings-chevron"></i>
+                    </button>
+                    <div class="settings-subnav" id="settingsSubnav" hidden>
+                        <a href="#" class="nav-item nav-subitem" data-page="analytics" id="nav-analytics"><i data-lucide="bar-chart-3"></i><span>Analytics</span></a>
+                        <a href="#" class="nav-item nav-subitem" data-page="settings" id="nav-settings"><i data-lucide="bot"></i><span>Configurações IA</span></a>
+                        <a href="#" class="nav-item nav-subitem" data-page="users" id="nav-users"><i data-lucide="users"></i><span>Gerenciar Usuários</span></a>
+                        <a href="#" class="nav-item nav-subitem" data-page="audit" id="nav-audit"><i data-lucide="history"></i><span>Log de Materiais</span></a>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Divisor -->
+            <div class="sidebar-divider"></div>
+
+            <!-- Histórico de Chats -->
+            <div class="chat-history" id="chatHistory">
+                <div class="chat-history-header">
+                    <h4 class="history-title">Histórico</h4>
+                    <button class="clear-history-btn" id="clearHistoryBtn" title="Apagar todo o histórico de conversas">
+                        <i data-lucide="trash-2"></i>
+                        <span>Limpar</span>
+                    </button>
+                </div>
+                <div class="history-section" id="history-today">
+                    <h4 class="history-title">Hoje</h4>
+                    <div class="history-items" id="historyToday"></div>
+                </div>
+                <div class="history-section" id="history-yesterday">
+                    <h4 class="history-title">Ontem</h4>
+                    <div class="history-items" id="historyYesterday"></div>
+                </div>
+                <div class="history-section" id="history-week">
+                    <h4 class="history-title">Últimos 7 dias</h4>
+                    <div class="history-items" id="historyWeek"></div>
+                </div>
+            </div>
+
+            <!-- Footer do Sidebar -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <button type="button" class="user-avatar" id="userAvatar" title="Editar meu perfil" aria-label="Editar meu perfil" aria-haspopup="dialog">MC</button>
+                    <div class="user-details">
+                        <div class="user-name-row">
+                            <span class="user-name" id="userName">Demo User</span>
+                            <span class="user-badge admin" id="userBadge" style="display:none;">Admin</span>
+                        </div>
+                        <span class="user-role" id="userRole">Analista Senior</span>
+                    </div>
+                    <div class="user-actions">
+                        <div class="theme-dropdown" id="themeDropdown">
+                            <button class="theme-toggle-btn" id="themeToggleBtn" title="Tema" aria-haspopup="true" aria-expanded="false">
+                                <span id="themeToggleIcon"><i data-lucide="monitor"></i></span>
+                            </button>
+                            <div class="theme-menu" id="themeMenu" role="menu" aria-label="Tema" hidden>
+                                <button class="theme-menu-item" data-theme-mode="system" role="menuitemradio">
+                                    <i data-lucide="monitor"></i><span>Sistema</span>
+                                </button>
+                                <button class="theme-menu-item" data-theme-mode="light" role="menuitemradio">
+                                    <i data-lucide="sun"></i><span>Claro</span>
+                                </button>
+                                <button class="theme-menu-item" data-theme-mode="dark" role="menuitemradio">
+                                    <i data-lucide="moon"></i><span>Escuro</span>
+                                </button>
+                            </div>
+                        </div>
+                        <button class="logout-btn" id="logoutBtn" title="Sair">
+                            <i data-lucide="log-out"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Botão para abrir sidebar (quando recolhido) -->
+        <button class="sidebar-open-btn" id="sidebarOpenBtn" title="Abrir menu">
+            <i data-lucide="panel-left-open"></i>
+        </button>
+
+        <!-- ============================================= -->
+        <!--  CONTEÚDO PRINCIPAL                           -->
+        <!-- ============================================= -->
+        <main class="main-content" id="mainContent">
+
+            <!-- ========================================= -->
+            <!--  PÁGINA: CHAT                             -->
+            <!-- ========================================= -->
+            <div class="page active" id="page-chat">
+                <header class="chat-topbar"><span>Workspace <span class="topbar-divider">/</span> <strong>Assistente IA</strong></span><span class="workspace-label"><i data-lucide="layers"></i> Conhecimento compartilhado</span></header>
+                <div class="chat-container" id="chatContainer">
+                    <!-- Tela de Boas-vindas -->
+                    <div class="welcome-screen" id="welcomeScreen">
+                        <div class="welcome-glow"></div>
+                        <div class="welcome-icon">
+                            <i data-lucide="sparkles"></i>
+                        </div>
+                        <span class="eyebrow welcome-eyebrow">MENOS BUSCA. MAIS CLAREZA.</span>
+                        <h1 class="welcome-title">Seu próximo passo começa<br>com uma <span class="gradient-text">boa resposta.</span></h1>
+                        <p class="welcome-subtitle">Explore o conhecimento da sua equipe. Pergunte sobre produtos, processos ou encontre o material que precisa.</p>
+
+                    </div>
+
+                    <!-- Container de Mensagens do Chat -->
+                    <div class="messages" id="messagesContainer"></div>
+                </div>
+
+                <!-- Barra de Input do Chat -->
+                <div class="chat-input-bar" id="chatInputBar">
+                    <div class="input-wrapper">
+                        <button class="attach-btn" id="attachBtn" title="Anexar arquivo">
+                            <i data-lucide="paperclip"></i>
+                        </button>
+                        <textarea id="chatInput" placeholder="Pergunte algo ao CorpBrain AI..." rows="1"></textarea>
+                        <button class="send-btn" id="sendBtn" title="Enviar mensagem" disabled>
+                            <i data-lucide="arrow-up"></i>
+                        </button>
+                    </div>
+                    <p class="input-disclaimer">CorpBrain AI pode cometer erros. Verifique informações importantes com a equipe responsável.</p>
+                </div>
+            </div>
+
+            <!-- ========================================= -->
+            <!--  PÁGINA: BASE DE CONHECIMENTO             -->
+            <div class="page" id="page-knowledge">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1 class="page-title"><i data-lucide="library"></i> Materiais de Apoio</h1>
+                        <p class="page-description">Explore documentos organizados por categoria. Pesquise por nome, tag ou tipo de arquivo.</p>
+                    </div>
+                    <div class="page-header-actions">
+                        <button class="add-user-btn" id="goToUploadsBtn" style="display:none;" title="Enviar novo arquivo">
+                            <i data-lucide="upload-cloud"></i>
+                            <span>Upload de Arquivo</span>
+                        </button>
+                        <button class="add-user-btn" id="addCategoryBtn" style="display:none;" title="Criar novo bloco de conhecimento">
+                            <i data-lucide="folder-plus"></i>
+                            <span>Nova Pasta</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Barra de Pesquisa -->
+                <div class="search-bar-container">
+                    <div class="search-bar">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="knowledgeSearch" placeholder="Pesquisar por nome, tag ou tipo de arquivo...">
+                        <button class="search-clear-btn" id="searchClearBtn" title="Limpar pesquisa" style="display:none;">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Categorias (renderizadas via JS) -->
+                <div class="knowledge-categories" id="knowledgeCategories">
+                </div>
+            </div>
+
+            <!-- ========================================= -->
+            <!--  PÁGINA: LOG DE MATERIAIS                  -->
+            <div class="page" id="page-audit">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1 class="page-title"><i data-lucide="history"></i> Log de Materiais</h1>
+                        <p class="page-description">Acompanhe as alterações feitas nos materiais de apoio e nas pastas.</p>
+                    </div>
+                    <button class="add-user-btn" id="refreshAuditBtn"><i data-lucide="refresh-cw"></i><span>Atualizar</span></button>
+                </div>
+                <div class="audit-content" id="auditContent"><div class="audit-loading">Carregando alterações…</div></div>
+            </div>
+
+            <!-- ========================================= -->
+            <!--  PÁGINA: CENTRAL DE UPLOADS               -->
+            <!-- ========================================= -->
+            <div class="page" id="page-uploads">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <button class="back-btn" id="uploadsBackBtn" title="Voltar para Materiais de Apoio">
+                            <i data-lucide="arrow-left"></i>
+                            <span>Voltar</span>
+                        </button>
+                        <h1 class="page-title"><i data-lucide="upload-cloud"></i> Central de Uploads</h1>
+                        <p class="page-description">Envie novos materiais para alimentar a base de conhecimento do CorpBrain AI.</p>
+                    </div>
+                </div>
+
+                <!-- Área de Drag & Drop -->
+                <div class="upload-dropzone" id="uploadDropzone">
+                    <div class="dropzone-content">
+                        <div class="dropzone-icon">
+                            <i data-lucide="cloud-upload"></i>
+                        </div>
+                        <h3>Arraste e solte seus arquivos aqui</h3>
+                        <p>ou clique para selecionar</p>
+                        <div class="dropzone-formats">
+                            <span class="format-badge">PDF</span>
+                            <span class="format-badge">PPTX</span>
+                            <span class="format-badge">DOCX</span>
+                            <span class="format-badge">XLSX</span>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.pptx,.docx,.xlsx" style="display:none;">
+                </div>
+
+                <!-- Seletor de Categoria para Upload -->
+                <div class="upload-category-selector" id="uploadCategorySelector" style="display:none;">
+                    <h3>Selecione a categoria do arquivo:</h3>
+                    <div class="category-options" id="uploadCategoryOptions">
+                        <!-- Renderizado via JS -->
+                    </div>
+                </div>
+
+                <!-- Lista de Arquivos em Processamento -->
+                <div class="upload-queue">
+                    <h3 class="queue-title" id="queueTitle" style="display:none;">
+                        <i data-lucide="loader"></i> Fila de Processamento
+                    </h3>
+                    <div class="queue-list" id="queueList"></div>
+                </div>
+            </div>
+
+            <!-- ========================================= -->
+            <!--  PÁGINA: ANALYTICS                        -->
+            <!-- ========================================= -->
+            <div class="page" id="page-analytics">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1 class="page-title"><i data-lucide="bar-chart-3"></i> Analytics & Logs</h1>
+                        <p class="page-description">Estatísticas de uso e desempenho do CorpBrain AI.</p>
+                    </div>
+                </div>
+
+                <!-- Cards de Métricas -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon queries"><i data-lucide="message-circle"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value" id="metricQueriesDay">0</span>
+                            <span class="metric-label">Perguntas Hoje</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon monthly"><i data-lucide="calendar-range"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value" id="metricQueriesMonth">0</span>
+                            <span class="metric-label">Perguntas no Mês</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon docs"><i data-lucide="file-text"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value" id="metricDocsTotal">0</span>
+                            <span class="metric-label">Documentos Indexados</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon confidence"><i data-lucide="shield-alert"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value" id="metricLowConfidence">0</span>
+                            <span class="metric-label">Baixa Confiança (mês)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid de Análises -->
+                <div class="analytics-grid">
+                    <!-- Termos mais pesquisados -->
+                    <div class="analytics-card">
+                        <div class="analytics-card-header">
+                            <h3><i data-lucide="hash"></i> Termos Mais Pesquisados</h3>
+                        </div>
+                        <div class="tag-cloud" id="tagCloud"></div>
+                    </div>
+
+                    <!-- Documentos mais acessados -->
+                    <div class="analytics-card">
+                        <div class="analytics-card-header">
+                            <h3><i data-lucide="file-search"></i> Documentos Mais Acessados</h3>
+                        </div>
+                        <div class="top-docs-list" id="topDocsList"></div>
+                    </div>
+
+                    <!-- Consumo de tokens por provedor -->
+                    <div class="analytics-card">
+                        <div class="analytics-card-header">
+                            <h3><i data-lucide="cpu"></i> Tokens por Provedor (mês)</h3>
+                            <span class="card-badge" title="Estimativa por número de caracteres, não vem do provedor">Estimado</span>
+                        </div>
+                        <p class="tokens-summary" id="tokensSummary">Hoje: 0 tokens · Este mês: 0 tokens</p>
+                        <div class="top-docs-list" id="tokensByProviderList"></div>
+                    </div>
+
+                    <!-- Consumo de tokens por usuário -->
+                    <div class="analytics-card">
+                        <div class="analytics-card-header">
+                            <h3><i data-lucide="users"></i> Tokens por Usuário (mês)</h3>
+                            <span class="card-badge" title="Estimativa por número de caracteres, não vem do provedor">Estimado</span>
+                        </div>
+                        <div class="top-docs-list" id="tokensByUserList"></div>
+                    </div>
+
+                    <!-- Respostas com baixa confiança -->
+                    <div class="analytics-card full-width">
+                        <div class="analytics-card-header">
+                            <h3><i data-lucide="alert-triangle"></i> Respostas com Baixa Confiança</h3>
+                            <span class="card-badge warning">Requer Atenção</span>
+                        </div>
+                        <div class="low-confidence-list" id="lowConfidenceList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================= -->
+            <!--  PÁGINA: CONFIGURAÇÕES IA (admin only)    -->
+            <!-- ========================================= -->
+            <div class="page" id="page-settings">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1 class="page-title"><i data-lucide="settings"></i> Configurações de IA</h1>
+                        <p class="page-description">Configure o provedor de inteligência artificial e a API key para alimentar o chat.</p>
+                    </div>
+                </div>
+
+                <div class="settings-content">
+                    <!-- Status Card -->
+                    <div class="settings-status-card" id="aiStatusCard">
+                        <div class="status-indicator offline" id="aiStatusIndicator"></div>
+                        <div class="status-info">
+                            <span class="status-label" id="aiStatusLabel">IA Offline — Usando respostas simuladas (Mock)</span>
+                            <span class="status-detail" id="aiStatusDetail">Configure uma API key para ativar a inteligência artificial real.</span>
+                        </div>
+                    </div>
+
+                    <!-- Provider Selection -->
+                    <div class="settings-card">
+                        <h3><i data-lucide="cpu"></i> Provedor de IA</h3>
+                        <div class="provider-grid" id="providerGrid">
+                            <button class="provider-option selected" data-provider="openai">
+                                <div class="provider-logo">🤖</div>
+                                <span class="provider-name">OpenAI</span>
+                                <span class="provider-models">GPT-4o, GPT-4, GPT-3.5</span>
+                            </button>
+                            <button class="provider-option" data-provider="gemini">
+                                <div class="provider-logo">✨</div>
+                                <span class="provider-name">Google Gemini</span>
+                                <span class="provider-models">Gemini 2.5, 2.0 Flash</span>
+                            </button>
+                            <button class="provider-option" data-provider="claude">
+                                <div class="provider-logo">🧠</div>
+                                <span class="provider-name">Anthropic Claude</span>
+                                <span class="provider-models">Claude Opus, Sonnet</span>
+                            </button>
+                            <button class="provider-option" data-provider="groq">
+                                <div class="provider-logo">⚡</div>
+                                <span class="provider-name">Groq</span>
+                                <span class="provider-models">Llama 3.3, DeepSeek (open source)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- API Key + Model -->
+                    <div class="settings-card">
+                        <h3><i data-lucide="key"></i> Configuração da API</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label>API Key</label>
+                                <div class="api-key-input-wrapper">
+                                    <input type="password" id="apiKeyInput" placeholder="Cole sua API key aqui...">
+                                    <button class="toggle-visibility-btn" id="toggleKeyVisibility" title="Mostrar/ocultar">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
+                                <span class="form-hint" id="apiKeyHint">A key é enviada só ao configurar e fica salva apenas no servidor — nunca volta para o navegador.</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Modelo</label>
+                                <select id="aiModelSelect">
+                                    <option value="gpt-4o">GPT-4o (Recomendado)</option>
+                                    <option value="gpt-4o-mini">GPT-4o Mini</option>
+                                    <option value="gpt-4">GPT-4</option>
+                                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Prompt do Sistema (opcional)</label>
+                                <textarea id="systemPromptInput" rows="4" placeholder="Instruções adicionais para a IA... Ex: Responda sempre em português formal."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="settings-actions">
+                        <button class="btn-test" id="testConnectionBtn">
+                            <i data-lucide="zap"></i>
+                            <span>Testar Conexão</span>
+                        </button>
+                        <button class="btn-save-settings" id="saveSettingsBtn">
+                            <i data-lucide="save"></i>
+                            <span>Salvar Configurações</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================= -->
+            <!--  PÁGINA: GERENCIAR USUÁRIOS (admin only)  -->
+            <!-- ========================================= -->
+            <div class="page" id="page-users">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1 class="page-title"><i data-lucide="users"></i> Gerenciar Usuários</h1>
+                        <p class="page-description">Adicione, edite ou remova usuários do sistema.</p>
+                    </div>
+                    <button class="add-user-btn" id="addUserBtn">
+                        <i data-lucide="user-plus"></i>
+                        <span>Novo Usuário</span>
+                    </button>
+                </div>
+
+                <!-- Tabela de Usuários -->
+                <div class="users-table-wrapper">
+                    <table class="users-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Papel</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Renderizado via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+    </div><!-- /app-wrapper -->
+
+    <!-- Toast / Notificações -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Script principal -->
+    <script src="app.js"></script>
+</body>
+</html>
