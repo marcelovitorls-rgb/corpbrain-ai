@@ -325,6 +325,14 @@ const API = {
 
 ## 🔮 Próximos Passos
 
+> Estado verificado no código: o chat já faz recuperação lexical por palavras-chave sobre textos extraídos e envia trechos selecionados ao provedor configurado. Isso é um RAG lexical, não uma busca semântica por embeddings. Ainda não há um conjunto de perguntas/respostas de referência nem métricas automatizadas de recuperação ou qualidade da resposta.
+
+Para executar os testes automatizados:
+
+```bash
+npm test
+```
+
 - [ ] Integração com API de IA (OpenAI / Gemini / Claude) para chat inteligente
 - [ ] Busca semântica na base de conhecimento
 - [ ] Indexação automática de documentos no upload

@@ -7,6 +7,7 @@ const { getDb } = require('../database');
 const { adminMiddleware } = require('../middleware/auth');
 const { extractFileText, PLAIN_TEXT_EXTS, OFFICE_EXTS } = require('../lib/extractText');
 const { encryptSecret, decryptSecret, isEncrypted, isCurrentEncryption } = require('../lib/secrets');
+const { extractKeywords, rankDocuments } = require('../lib/retrieval');
 
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
 
@@ -87,22 +88,6 @@ function buildKBContext() {
     return lines.join('\n');
 }
 
-const STOPWORDS = new Set([
-    'para', 'com', 'uma', 'umas', 'uns', 'que', 'como', 'qual', 'quais', 'quando', 'onde',
-    'sobre', 'isso', 'esse', 'essa', 'este', 'esta', 'pelo', 'pela', 'dos', 'das', 'nos', 'nas',
-    'tem', 'ser', 'sao', 'the', 'and', 'for', 'from', 'com', 'de', 'da', 'do', 'em', 'no', 'na',
-    'os', 'as', 'seu', 'sua', 'seus', 'suas', 'mais', 'muito', 'quero', 'gostaria', 'poderia'
-]);
-
-/** Extrai palavras "significativas" (>=3 letras, sem acento, sem stopwords) de um texto */
-function extractKeywords(text) {
-    const words = (text || '')
-        .toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .match(/[a-z0-9]{3,}/g) || [];
-    return words.filter(w => !STOPWORDS.has(w));
-}
-
 /**
  * Busca, entre os arquivos com conteúdo extraível (PDF/texto) já enviados,
  * os que têm mais palavras da pergunta do usuário aparecendo no próprio texto,
@@ -111,9 +96,6 @@ function extractKeywords(text) {
  * precisar de embeddings/índice vetorial.
  */
 async function findRelevantDocuments(userMessage, maxDocs = 3, maxCharsPerDoc = 4000) {
-    const questionKeywords = [...new Set(extractKeywords(userMessage))];
-    if (questionKeywords.length === 0) return [];
-
     const db = getDb();
     const files = db.prepare(`
         SELECT f.original_name, f.stored_name, f.ext, f.extracted_text, c.label AS cat_label
@@ -121,7 +103,7 @@ async function findRelevantDocuments(userMessage, maxDocs = 3, maxCharsPerDoc = 
         INNER JOIN categories c ON c.id = f.category_id
     `).all();
 
-    const scored = [];
+    const candidates = [];
     for (const file of files) {
         const ext = (file.ext || '').toLowerCase().replace('.', '');
         if (ext !== 'pdf' && !PLAIN_TEXT_EXTS.has(ext) && !OFFICE_EXTS.has(ext)) continue; // tipo sem extração de texto
@@ -132,28 +114,9 @@ async function findRelevantDocuments(userMessage, maxDocs = 3, maxCharsPerDoc = 
         const text = file.extracted_text || (await extractFileText(filePath, ext)).text;
         if (!text) continue;
 
-        const contentKeywords = extractKeywords(text);
-        const contentKeywordSet = new Set(contentKeywords);
-        const matchedKeywords = questionKeywords.filter(kw => contentKeywordSet.has(kw));
-        if (matchedKeywords.length === 0) continue;
-
-        // Evita falsos positivos: uma pergunta com uma única palavra-chave genérica
-        // (ex.: "teste") que aparece só de passagem no documento não é evidência real
-        // de que o conteúdo seja sobre aquele assunto. Exige presença mais robusta.
-        const isRelevant = questionKeywords.length === 1
-            ? contentKeywords.filter(w => w === questionKeywords[0]).length >= 2
-            : (matchedKeywords.length / questionKeywords.length) >= 0.4;
-        if (!isRelevant) continue;
-
-        scored.push({ name: file.original_name, category: file.cat_label, text, score: matchedKeywords.length });
+        candidates.push({ name: file.original_name, category: file.cat_label, text });
     }
-
-    scored.sort((a, b) => b.score - a.score);
-    return scored.slice(0, maxDocs).map(d => ({
-        name: d.name,
-        category: d.category,
-        text: d.text.length > maxCharsPerDoc ? d.text.slice(0, maxCharsPerDoc) + '…' : d.text
-    }));
+    return rankDocuments(candidates, userMessage, maxDocs, maxCharsPerDoc);
 }
 
 const MAX_HISTORY_MESSAGES = 12;
